@@ -1,7 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.request
+import argparse
+import os
 
+#Argument parsing for folder management
+parser = argparse.ArgumentParser(description='Program that downloads all the official simfile packs from https://zenius-i-vanisher.com/')
+parser.add_argument('-s','--songs', help='The Songs folder for your StepMania setup')
+songs_folder = parser.parse_args().songs
+if songs_folder == None:
+    songs_folder = os.getcwd()
 #Prepare the URL we will use at the end
 url_download = "https://zenius-i-vanisher.com/v5.2/download.php?type=ddrpack&categoryid="
 #Get html page as string
@@ -17,9 +25,10 @@ for select in select_list:
         for option in option_list:
             #Exclude null values ("Select a category" option )
             if option['value'] != "0":
-                url = url_download + str(option['value'])
-                print(url)
-                #Save the file locally
-                data = urllib.request.urlopen(url).read()
-                file = open(option.text + ".zip", 'wb')
-                file.write(data)
+                if os.path.isdir(songs_folder + "\\" + option.text) == False:
+                    url = url_download + str(option['value'])
+                    print(url)
+                    #Save the file locally
+                    data = urllib.request.urlopen(url).read()
+                    file = open(songs_folder + "\\" + option.text + ".zip", 'wb')
+                    file.write(data)
